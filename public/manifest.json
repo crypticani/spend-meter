@@ -1,0 +1,26 @@
+{
+  "name": "SpendMeter",
+  "short_name": "SpendMeter",
+  "description": "A mobile-first, local-first personal finance tracker. Track spending across bank accounts, credit cards, and cash — all offline.",
+  "start_url": "/spend-meter/",
+  "scope": "/spend-meter/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#6c5ce7",
+  "background_color": "#0a0a0f",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/spend-meter/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/spend-meter/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
