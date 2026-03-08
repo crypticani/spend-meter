@@ -42,7 +42,7 @@ export interface RecurringPayment {
     categoryId: string;
     frequency: 'monthly' | 'weekly' | 'yearly';
     startDate: Date;
-    totalInstallments: number;
+    totalInstallments?: number;
     completedInstallments: number;
     isActive: boolean;
     createdAt: Date;

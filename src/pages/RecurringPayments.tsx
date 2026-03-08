@@ -34,7 +34,7 @@ export default function RecurringPayments() {
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name || !form.amount || !form.accountId || !form.categoryId || !form.totalInstallments) return;
+        if (!form.name || !form.amount || !form.accountId || !form.categoryId) return;
 
         await addRecurringPayment({
             name: form.name,
@@ -43,7 +43,7 @@ export default function RecurringPayments() {
             categoryId: form.categoryId,
             frequency: form.frequency,
             startDate: new Date(form.startDate),
-            totalInstallments: parseInt(form.totalInstallments),
+            totalInstallments: form.totalInstallments ? parseInt(form.totalInstallments) : undefined,
             isActive: true,
         });
 
@@ -59,7 +59,7 @@ export default function RecurringPayments() {
             amount: rp.amount,
             type: 'expense',
             categoryId: rp.categoryId || transferCat?.id || '',
-            description: `${rp.name} - EMI ${rp.completedInstallments + 1}/${rp.totalInstallments}`,
+            description: `${rp.name} - EMI ${rp.completedInstallments + 1}${rp.totalInstallments ? `/${rp.totalInstallments}` : ''}`,
             date: new Date(),
         });
         await markInstallmentComplete(rp.id);
@@ -109,7 +109,7 @@ export default function RecurringPayments() {
                                     {active.map((rp) => {
                                         const account = getAccount(rp.accountId);
                                         const category = getCategory(rp.categoryId);
-                                        const progress = (rp.completedInstallments / rp.totalInstallments) * 100;
+                                        const progress = rp.totalInstallments ? (rp.completedInstallments / rp.totalInstallments) * 100 : 0;
 
                                         return (
                                             <div
@@ -147,18 +147,20 @@ export default function RecurringPayments() {
                                                 </div>
                                                 <div className="flex items-center justify-between mb-1.5">
                                                     <span className="text-xs text-[var(--color-text-muted)]">
-                                                        {rp.completedInstallments}/{rp.totalInstallments} paid
+                                                        {rp.totalInstallments ? `${rp.completedInstallments}/${rp.totalInstallments} paid` : `${rp.completedInstallments} paid (Ongoing)`}
                                                     </span>
                                                     <span className="text-sm font-bold text-[var(--color-expense)]">
                                                         {formatCurrency(rp.amount)}
                                                     </span>
                                                 </div>
-                                                <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
-                                                    <div
-                                                        className="h-full rounded-full transition-all bg-[var(--color-warning)]"
-                                                        style={{ width: `${progress}%` }}
-                                                    />
-                                                </div>
+                                                {rp.totalInstallments !== undefined && (
+                                                    <div className="w-full h-1.5 rounded-full bg-[var(--color-bg-elevated)]">
+                                                        <div
+                                                            className="h-full rounded-full transition-all bg-[var(--color-warning)]"
+                                                            style={{ width: `${progress}%` }}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })}
@@ -276,8 +278,7 @@ export default function RecurringPayments() {
                                 type="number"
                                 value={form.totalInstallments}
                                 onChange={(e) => setForm({ ...form, totalInstallments: e.target.value })}
-                                placeholder="12"
-                                required
+                                placeholder="Unlimited"
                                 min="1"
                                 className="w-full px-4 py-3 rounded-xl outline-none text-sm"
                                 style={{ background: 'var(--color-bg-input)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)' }}

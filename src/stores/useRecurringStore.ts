@@ -52,7 +52,7 @@ export const useRecurringStore = create<RecurringState>((set, get) => ({
         const rp = get().recurringPayments.find((r) => r.id === id);
         if (rp) {
             const completed = rp.completedInstallments + 1;
-            const isActive = completed < rp.totalInstallments;
+            const isActive = rp.totalInstallments ? completed < rp.totalInstallments : true;
             await db.recurringPayments.update(id, {
                 completedInstallments: completed,
                 isActive,

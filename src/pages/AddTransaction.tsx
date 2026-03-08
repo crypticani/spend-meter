@@ -80,7 +80,7 @@ export default function AddTransaction() {
         <div className="animate-fade-in">
             <PageHeader title="Add Transaction" showBack />
 
-            <form onSubmit={handleSubmit} className="px-4 py-4 space-y-5">
+            <form onSubmit={handleSubmit} className="px-4 py-4 space-y-5 pb-24">
                 {/* Type Selector */}
                 <div className="flex rounded-xl overflow-hidden" style={{ background: 'var(--color-bg-card)' }}>
                     {(['expense', 'income', 'transfer'] as TxType[]).map((t) => (
@@ -232,16 +232,26 @@ export default function AddTransaction() {
                 </div>
 
                 {/* Submit */}
-                <button
-                    type="submit"
-                    disabled={saving || !amount || !accountId}
-                    className="w-full py-4 rounded-xl text-base font-bold text-white transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+                <div
+                    className="fixed bottom-0 left-0 right-0 p-4 z-40 max-w-lg mx-auto"
                     style={{
-                        background: `linear-gradient(135deg, ${typeColors[type]}, ${typeColors[type]}cc)`,
+                        background: 'var(--color-bg)',
+                        borderTop: '1px solid var(--color-border)',
+                        paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))'
                     }}
                 >
-                    {saving ? 'Saving...' : `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`}
-                </button>
+                    <button
+                        type="submit"
+                        disabled={saving || !amount || !accountId}
+                        className="w-full py-4 rounded-xl text-base font-bold text-white transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+                        style={{
+                            background: `linear-gradient(135deg, ${typeColors[type]}, ${typeColors[type]}cc)`,
+                            boxShadow: `0 4px 15px ${typeColors[type]}40`
+                        }}
+                    >
+                        {saving ? 'Saving...' : `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`}
+                    </button>
+                </div>
             </form>
         </div>
     );
