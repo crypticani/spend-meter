@@ -80,7 +80,7 @@ export default function AddTransaction() {
         <div className="animate-fade-in">
             <PageHeader title="Add Transaction" showBack />
 
-            <form onSubmit={handleSubmit} className="px-4 py-4 space-y-5 pb-24">
+            <form onSubmit={handleSubmit} className="px-4 py-4 space-y-5 pb-32">
                 {/* Type Selector */}
                 <div className="flex rounded-xl overflow-hidden" style={{ background: 'var(--color-bg-card)' }}>
                     {(['expense', 'income', 'transfer'] as TxType[]).map((t) => (
@@ -233,7 +233,7 @@ export default function AddTransaction() {
 
                 {/* Submit */}
                 <div
-                    className="fixed bottom-0 left-0 right-0 p-4 z-40 max-w-lg mx-auto"
+                    className="fixed bottom-16 left-0 right-0 p-4 z-40 max-w-lg mx-auto"
                     style={{
                         background: 'var(--color-bg)',
                         borderTop: '1px solid var(--color-border)',
