@@ -245,8 +245,9 @@ export default function AddTransaction() {
                         disabled={saving || !amount || !accountId}
                         className="w-full py-4 rounded-xl text-base font-bold text-white transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
                         style={{
-                            background: `linear-gradient(135deg, ${typeColors[type]}, ${typeColors[type]}cc)`,
-                            boxShadow: `0 4px 15px ${typeColors[type]}40`
+                            backgroundColor: typeColors[type],
+                            backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.1))`,
+                            boxShadow: `0 4px 15px rgba(0,0,0,0.2)`
                         }}
                     >
                         {saving ? 'Saving...' : `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`}
