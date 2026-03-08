@@ -12,7 +12,7 @@ import Settings from './pages/Settings';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/spend-meter">
+    <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />

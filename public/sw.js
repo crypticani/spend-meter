@@ -1,8 +1,8 @@
 const CACHE_NAME = 'spendmeter-v1';
 const STATIC_ASSETS = [
-    '/spend-meter/',
-    '/spend-meter/index.html',
-    '/spend-meter/manifest.json',
+    '/',
+    '/index.html',
+    '/manifest.json',
 ];
 
 // Install: cache static assets
@@ -40,7 +40,7 @@ self.addEventListener('fetch', (event) => {
                     caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
                     return response;
                 })
-                .catch(() => caches.match('/spend-meter/index.html'))
+                .catch(() => caches.match('/index.html'))
         );
         return;
     }
