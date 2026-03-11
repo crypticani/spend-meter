@@ -45,6 +45,7 @@ export interface RecurringPayment {
     totalInstallments?: number;
     completedInstallments: number;
     isActive: boolean;
+    autoPay: boolean;
     createdAt: Date;
 }
 
@@ -56,11 +57,11 @@ class SpendMeterDB extends Dexie {
 
     constructor() {
         super('SpendMeterDB');
-        this.version(1).stores({
+        this.version(2).stores({
             accounts: 'id, name, type, createdAt',
             transactions: 'id, accountId, toAccountId, type, categoryId, date, createdAt',
             categories: 'id, name, type, isDefault',
-            recurringPayments: 'id, accountId, categoryId, isActive, startDate',
+            recurringPayments: 'id, accountId, categoryId, isActive, autoPay, startDate',
         });
     }
 }

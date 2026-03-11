@@ -75,3 +75,11 @@ const accountColors = [
 export function getRandomAccountColor(): string {
     return accountColors[Math.floor(Math.random() * accountColors.length)];
 }
+
+export function getNextDueDate(startDate: Date, frequency: 'monthly' | 'weekly' | 'yearly', completedInstallments: number): Date {
+    const date = new Date(startDate);
+    if (frequency === 'monthly') date.setMonth(date.getMonth() + completedInstallments);
+    else if (frequency === 'yearly') date.setFullYear(date.getFullYear() + completedInstallments);
+    else if (frequency === 'weekly') date.setDate(date.getDate() + 7 * completedInstallments);
+    return date;
+}

@@ -28,6 +28,7 @@ export const useRecurringStore = create<RecurringState>((set, get) => ({
             ...rpData,
             id: uuidv4(),
             completedInstallments: 0,
+            autoPay: rpData.autoPay ?? false,
             createdAt: new Date(),
         };
         await db.recurringPayments.add(rp);

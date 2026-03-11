@@ -4,7 +4,7 @@ import { useRecurringStore } from '../stores/useRecurringStore';
 import { useAccountStore } from '../stores/useAccountStore';
 import { useCategoryStore } from '../stores/useCategoryStore';
 import { useTransactionStore } from '../stores/useTransactionStore';
-import { formatCurrency, toDateInputValue } from '../utils/format';
+import { formatCurrency, toDateInputValue, getNextDueDate, formatDateShort } from '../utils/format';
 import PageHeader from '../components/ui/PageHeader';
 import Modal from '../components/ui/Modal';
 import EmptyState from '../components/ui/EmptyState';
@@ -20,7 +20,7 @@ export default function RecurringPayments() {
         loadRecurringPayments();
         loadAccounts();
         loadCategories();
-    }, []);
+    }, [loadRecurringPayments, loadAccounts, loadCategories]);
 
     const [form, setForm] = useState({
         name: '',
@@ -30,6 +30,7 @@ export default function RecurringPayments() {
         frequency: 'monthly' as 'monthly' | 'weekly' | 'yearly',
         startDate: toDateInputValue(new Date()),
         totalInstallments: '',
+        autoPay: false,
     });
 
     const handleAdd = async (e: React.FormEvent) => {
@@ -45,14 +46,17 @@ export default function RecurringPayments() {
             startDate: new Date(form.startDate),
             totalInstallments: form.totalInstallments ? parseInt(form.totalInstallments) : undefined,
             isActive: true,
+            autoPay: form.autoPay,
         });
 
-        setForm({ name: '', amount: '', accountId: '', categoryId: '', frequency: 'monthly', startDate: toDateInputValue(new Date()), totalInstallments: '' });
+        setForm({ name: '', amount: '', accountId: '', categoryId: '', frequency: 'monthly', startDate: toDateInputValue(new Date()), totalInstallments: '', autoPay: false });
         setShowModal(false);
     };
 
     const handlePayInstallment = async (rp: typeof recurringPayments[0]) => {
-        // Create a transaction for this installment
+        const nextDue = getNextDueDate(rp.startDate, rp.frequency, rp.completedInstallments);
+
+        // Create a transaction for this installment on the due date instead of 'now'
         const transferCat = categories.find((c) => c.name === 'Transfer') || categories[0];
         await addTransaction({
             accountId: rp.accountId,
@@ -60,7 +64,7 @@ export default function RecurringPayments() {
             type: 'expense',
             categoryId: rp.categoryId || transferCat?.id || '',
             description: `${rp.name} - EMI ${rp.completedInstallments + 1}${rp.totalInstallments ? `/${rp.totalInstallments}` : ''}`,
-            date: new Date(),
+            date: nextDue,
         });
         await markInstallmentComplete(rp.id);
         await loadAccounts();
@@ -110,6 +114,8 @@ export default function RecurringPayments() {
                                         const account = getAccount(rp.accountId);
                                         const category = getCategory(rp.categoryId);
                                         const progress = rp.totalInstallments ? (rp.completedInstallments / rp.totalInstallments) * 100 : 0;
+                                        const nextDue = getNextDueDate(rp.startDate, rp.frequency, rp.completedInstallments);
+                                        const isOverdue = nextDue < new Date() && !rp.autoPay;
 
                                         return (
                                             <div
@@ -127,6 +133,11 @@ export default function RecurringPayments() {
                                                             <p className="text-xs text-[var(--color-text-muted)]">
                                                                 {account?.name} · {rp.frequency} · {category?.name}
                                                             </p>
+                                                            {rp.autoPay && (
+                                                                <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-[var(--color-accent)]/10 text-[var(--color-accent-light)] uppercase tracking-wider">
+                                                                    Auto-Pay
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-1">
@@ -146,9 +157,14 @@ export default function RecurringPayments() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center justify-between mb-1.5">
-                                                    <span className="text-xs text-[var(--color-text-muted)]">
-                                                        {rp.totalInstallments ? `${rp.completedInstallments}/${rp.totalInstallments} paid` : `${rp.completedInstallments} paid (Ongoing)`}
-                                                    </span>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs text-[var(--color-text-muted)]">
+                                                            {rp.totalInstallments ? `${rp.completedInstallments}/${rp.totalInstallments} paid` : `${rp.completedInstallments} paid (Ongoing)`}
+                                                        </span>
+                                                        <span className={`text-[10px] font-medium mt-0.5 ${isOverdue ? 'text-[var(--color-danger)]' : 'text-[var(--color-text-muted)]'}`}>
+                                                            Next due: {formatDateShort(nextDue)} {isOverdue ? '(Overdue)' : ''}
+                                                        </span>
+                                                    </div>
                                                     <span className="text-sm font-bold text-[var(--color-expense)]">
                                                         {formatCurrency(rp.amount)}
                                                     </span>
@@ -296,6 +312,19 @@ export default function RecurringPayments() {
                             className="w-full px-4 py-3 rounded-xl outline-none text-sm"
                             style={{ background: 'var(--color-bg-input)', border: '1px solid var(--color-border)', color: 'var(--color-text-primary)', colorScheme: 'dark' }}
                         />
+                    </div>
+
+                    <div className="flex items-center gap-3 py-2">
+                        <input
+                            type="checkbox"
+                            checked={form.autoPay}
+                            onChange={(e) => setForm({ ...form, autoPay: e.target.checked })}
+                            id="autopay-toggle"
+                            className="w-4 h-4 rounded text-[var(--color-accent)] focus:ring-[var(--color-accent)] focus:ring-2 bg-[var(--color-bg-input)] border-var(--color-border)"
+                        />
+                        <label htmlFor="autopay-toggle" className="text-sm cursor-pointer select-none font-medium mb-0">
+                            Auto Pay (process on due date)
+                        </label>
                     </div>
 
                     <button
