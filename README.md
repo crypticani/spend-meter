@@ -7,15 +7,14 @@ A **mobile-first**, **local-first** personal finance tracker that runs entirely 
 ## ✨ Features
 
 - **Multiple Accounts** — Track bank accounts, credit cards, and cash wallets
-- **Transaction Tracking** — Log expenses, income, and transfers between accounts
+- **Transaction Tracking** — Log expenses, income, and transfers with full **edit/delete** support
 - **Smart Categories** — Default + custom categories with emoji icons
-- **Recurring Payments** — EMI and subscription tracking with installment progress
-- **Dashboard** — Net worth, monthly spending, upcoming payments at a glance
-- **Analytics** — Beautiful charts powered by Apache ECharts
-- **Data Backup** — Export/Import your data as JSON
+- **Recurring Payments** — Subscriptions & EMIs with **exact due-dates** and optional **Auto-Pay**
+- **Dashboard** — Net worth, monthly spending, and upcoming payments at a glance
+- **Analytics** — Beautiful charts and spending insights powered by Apache ECharts
+- **Data Backup** — Export/Import your data as JSON for total portability
 - **Offline Ready** — Works without internet as a Progressive Web App (PWA)
-- **Installable** — Add to your home screen like a native app
-- **Privacy First** — All data stored locally in IndexedDB
+- **Privacy First** — All data stays locally in your browser's IndexedDB
 
 ## 🛠️ Tech Stack
 
@@ -125,14 +124,16 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## 🗺️ Roadmap
 
-- [ ] Budget goals per category
-- [ ] Multi-currency support
-- [ ] Dark/Light theme toggle
-- [ ] Transaction search
-- [ ] Receipt photo attachment
-- [ ] Data sync via file (no cloud)
-- [ ] Transaction tags
-- [ ] Monthly/weekly reports
+- [ ] **Budgeting**: Set monthly limits per category with visual progress tracking
+- [ ] **Savings Goals**: Plan for specific big purchases with dedicated goal tracking
+- [ ] **Advanced Filtering**: Search transactions by text and filter by custom date ranges
+- [ ] **Ghost Mode**: Privacy toggle to hide/blur balances in public spaces
+- [ ] **Receipts**: Attach photo receipts to transactions (stored as Blobs)
+- [ ] **Transaction Tags**: Multi-tag support for cross-category tracking (e.g., `#vacation`)
+- [ ] **Export Options**: Export data as formatted CSV or PDF reports
+- [ ] **App Lock**: Biometric/PIN security using Web Authentication API
+- [ ] **Cloud Sync**: Optional self-hosted sync (WebDAV/CouchDB) for multi-device users
+- [ ] **Bulk Actions**: Select and edit/delete multiple transactions at once
 
 ---
 
