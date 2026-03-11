@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useTransactionStore } from '../stores/useTransactionStore';
 import { useAccountStore } from '../stores/useAccountStore';
 import { useCategoryStore } from '../stores/useCategoryStore';
@@ -9,8 +9,9 @@ import PageHeader from '../components/ui/PageHeader';
 type TxType = 'expense' | 'income' | 'transfer';
 
 export default function AddTransaction() {
+    const { id } = useParams();
     const navigate = useNavigate();
-    const { addTransaction } = useTransactionStore();
+    const { transactions, addTransaction, updateTransaction } = useTransactionStore();
     const { accounts, loadAccounts } = useAccountStore();
     const { categories, loadCategories } = useCategoryStore();
 
@@ -26,13 +27,28 @@ export default function AddTransaction() {
     useEffect(() => {
         loadAccounts();
         loadCategories();
-    }, []);
+
+        if (id) {
+            const tx = transactions.find((t) => t.id === id);
+            if (tx) {
+                setType(tx.type);
+                setAmount(tx.amount.toString());
+                setAccountId(tx.accountId);
+                setToAccountId(tx.toAccountId || '');
+                setCategoryId(tx.categoryId);
+                setDescription(tx.description);
+                setDate(toDateInputValue(new Date(tx.date)));
+            } else {
+                navigate('/transactions');
+            }
+        }
+    }, [id, transactions]);
 
     useEffect(() => {
-        if (accounts.length > 0 && !accountId) {
+        if (accounts.length > 0 && !accountId && !id) {
             setAccountId(accounts[0].id);
         }
-    }, [accounts]);
+    }, [accounts, accountId, id]);
 
     const filteredCategories = categories.filter(
         (c) => c.type === type || c.type === 'both' || type === 'transfer'
@@ -54,7 +70,7 @@ export default function AddTransaction() {
 
         setSaving(true);
         try {
-            await addTransaction({
+            const txData = {
                 accountId,
                 toAccountId: type === 'transfer' ? toAccountId : undefined,
                 amount: parseFloat(amount),
@@ -62,7 +78,14 @@ export default function AddTransaction() {
                 categoryId,
                 description,
                 date: new Date(date),
-            });
+            };
+
+            if (id) {
+                await updateTransaction(id, txData);
+            } else {
+                await addTransaction(txData);
+            }
+
             await loadAccounts();
             navigate(-1);
         } catch {
@@ -78,7 +101,7 @@ export default function AddTransaction() {
 
     return (
         <div className="animate-fade-in">
-            <PageHeader title="Add Transaction" showBack />
+            <PageHeader title={id ? "Edit Transaction" : "Add Transaction"} showBack />
 
             <form onSubmit={handleSubmit} className="px-4 py-4 space-y-5 pb-32">
                 {/* Type Selector */}
@@ -250,7 +273,7 @@ export default function AddTransaction() {
                             boxShadow: `0 4px 15px rgba(0,0,0,0.2)`
                         }}
                     >
-                        {saving ? 'Saving...' : `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`}
+                        {saving ? 'Saving...' : id ? 'Save Changes' : `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`}
                     </button>
                 </div>
             </form>

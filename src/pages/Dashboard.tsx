@@ -264,6 +264,7 @@ function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label:
 function RecentTransactions({ transactions }: { transactions: import('../db/database').Transaction[] }) {
     const { getCategory } = useCategoryStore();
     const { getAccount } = useAccountStore();
+    const navigate = useNavigate();
 
     return (
         <div className="space-y-2">
@@ -273,7 +274,8 @@ function RecentTransactions({ transactions }: { transactions: import('../db/data
                 return (
                     <div
                         key={tx.id}
-                        className="flex items-center justify-between p-3 rounded-xl"
+                        onClick={() => navigate(`/edit/${tx.id}`)}
+                        className="flex items-center justify-between p-3 rounded-xl cursor-pointer hover:scale-[1.01] transition-transform"
                         style={{ background: 'var(--color-bg-card)' }}
                     >
                         <div className="flex items-center gap-3">

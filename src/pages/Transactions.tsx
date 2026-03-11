@@ -6,7 +6,7 @@ import { formatCurrency, formatDateShort } from '../utils/format';
 import PageHeader from '../components/ui/PageHeader';
 import EmptyState from '../components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
-import { Filter, Trash2 } from 'lucide-react';
+import { Filter, Trash2, Edit2 } from 'lucide-react';
 
 export default function Transactions() {
     const { transactions, loadTransactions, deleteTransaction } = useTransactionStore();
@@ -141,6 +141,12 @@ export default function Transactions() {
                                                     >
                                                         {tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : ''}{formatCurrency(tx.amount)}
                                                     </p>
+                                                    <button
+                                                        onClick={() => navigate(`/edit/${tx.id}`)}
+                                                        className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[var(--color-accent)]/10 transition-all"
+                                                    >
+                                                        <Edit2 size={14} className="text-[var(--color-accent)]" />
+                                                    </button>
                                                     <button
                                                         onClick={() => handleDelete(tx.id)}
                                                         className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-[var(--color-danger)]/10 transition-all"

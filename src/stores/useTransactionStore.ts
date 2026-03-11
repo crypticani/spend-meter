@@ -69,10 +69,44 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
     },
 
     updateTransaction: async (id, updates) => {
+        const oldTx = get().transactions.find((t) => t.id === id);
+        if (!oldTx) return;
+
+        // First, reverse the old transaction's effect on balances
+        if (oldTx.type === 'expense') {
+            const account = await db.accounts.get(oldTx.accountId);
+            if (account) await db.accounts.update(oldTx.accountId, { balance: account.balance + oldTx.amount });
+        } else if (oldTx.type === 'income') {
+            const account = await db.accounts.get(oldTx.accountId);
+            if (account) await db.accounts.update(oldTx.accountId, { balance: account.balance - oldTx.amount });
+        } else if (oldTx.type === 'transfer' && oldTx.toAccountId) {
+            const fromAccount = await db.accounts.get(oldTx.accountId);
+            const toAccount = await db.accounts.get(oldTx.toAccountId);
+            if (fromAccount) await db.accounts.update(oldTx.accountId, { balance: fromAccount.balance + oldTx.amount });
+            if (toAccount) await db.accounts.update(oldTx.toAccountId, { balance: toAccount.balance - oldTx.amount });
+        }
+
+        // Apply the updates to the transaction record
+        const updatedTx = { ...oldTx, ...updates };
         await db.transactions.update(id, updates);
+
+        // Next, apply the new transaction's effect on balances
+        if (updatedTx.type === 'expense') {
+            const account = await db.accounts.get(updatedTx.accountId);
+            if (account) await db.accounts.update(updatedTx.accountId, { balance: account.balance - updatedTx.amount, updatedAt: new Date() });
+        } else if (updatedTx.type === 'income') {
+            const account = await db.accounts.get(updatedTx.accountId);
+            if (account) await db.accounts.update(updatedTx.accountId, { balance: account.balance + updatedTx.amount, updatedAt: new Date() });
+        } else if (updatedTx.type === 'transfer' && updatedTx.toAccountId) {
+            const fromAccount = await db.accounts.get(updatedTx.accountId);
+            const toAccount = await db.accounts.get(updatedTx.toAccountId);
+            if (fromAccount) await db.accounts.update(updatedTx.accountId, { balance: fromAccount.balance - updatedTx.amount, updatedAt: new Date() });
+            if (toAccount) await db.accounts.update(updatedTx.toAccountId, { balance: toAccount.balance + updatedTx.amount, updatedAt: new Date() });
+        }
+
         set({
             transactions: get().transactions.map((t) =>
-                t.id === id ? { ...t, ...updates } : t
+                t.id === id ? updatedTx : t
             ),
         });
     },
